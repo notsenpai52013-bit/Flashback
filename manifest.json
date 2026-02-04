@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "Miniblox Flashback",
+  "version": "0.1",
+  "description": "Client-side replay & freelook for Miniblox.io",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["*://miniblox.io/*"],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://miniblox.io/*"],
+      "js": ["content.js"]
+    }
+  ]
+}
