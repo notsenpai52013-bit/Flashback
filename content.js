@@ -1,11 +1,11 @@
-console.log("[Flashback] content.js loaded");
+console.log("[Flashback] content.js running");
 
-const script = document.createElement("script");
-script.src = chrome.runtime.getURL("replay.js");
-script.type = "text/javascript";
-
-script.onload = () => {
-  console.log("[Flashback] replay.js injected");
-};
-
-(document.documentElement || document.head).appendChild(script);
+chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  if (msg === "INJECT_REPLAY") {
+    chrome.scripting.executeScript({
+      target: { tabId: sender.tab.id },
+      world: "MAIN",
+      files: ["replay.js"]
+    });
+  }
+});
