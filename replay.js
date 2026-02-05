@@ -1,81 +1,62 @@
 (() => {
-  console.log("[Flashback] replay.js injected");
+  console.log("[Flashback] replay.js running");
 
-  // =====================
-  // STATE
-  // =====================
   const frames = [];
   let recording = false;
   let playing = false;
-  let recordInterval = null;
+  let intervalId = null;
 
-  // =====================
-  // CAMERA ACCESS (fallback-safe)
-  // =====================
-  function getCamera() {
-    // Try common patterns
+  function findCamera() {
     if (window.camera) return window.camera;
     if (window.game?.camera) return window.game.camera;
     if (window.renderer?.camera) return window.renderer.camera;
 
-    // Try Three.js camera
-    if (window.THREE) {
-      for (const k in window) {
-        const v = window[k];
-        if (v && v.isPerspectiveCamera) return v;
-      }
+    for (const k in window) {
+      const v = window[k];
+      if (v && v.isPerspectiveCamera) return v;
     }
     return null;
   }
 
-  // =====================
-  // RECORDING
-  // =====================
-  function recordFrame() {
+  function record() {
     if (!recording) return;
 
-    const cam = getCamera();
+    const cam = findCamera();
     if (!cam) return;
 
     frames.push({
-      time: performance.now(),
-      rot: {
-        x: cam.rotation?.x ?? 0,
-        y: cam.rotation?.y ?? 0,
-        z: cam.rotation?.z ?? 0
-      },
+      rot: cam.rotation
+        ? { x: cam.rotation.x, y: cam.rotation.y, z: cam.rotation.z }
+        : null,
       pos: cam.position
         ? { x: cam.position.x, y: cam.position.y, z: cam.position.z }
         : null
     });
   }
 
-  function startRecording() {
+  function start() {
     frames.length = 0;
     recording = true;
 
-    if (recordInterval) clearInterval(recordInterval);
-    recordInterval = setInterval(recordFrame, 50);
+    clearInterval(intervalId);
+    intervalId = setInterval(record, 50);
 
     console.log("[Flashback] Recording started");
   }
 
-  function stopRecording() {
+  function stop() {
     recording = false;
-    if (recordInterval) clearInterval(recordInterval);
+    clearInterval(intervalId);
     console.log("[Flashback] Recording stopped | Frames:", frames.length);
   }
 
-  // =====================
-  // PLAYBACK
-  // =====================
-  function playReplay() {
-    if (frames.length === 0) {
-      console.warn("[Flashback] No frames to play");
+  function play() {
+    if (!frames.length) {
+      console.warn("[Flashback] No frames");
       return;
     }
 
-    const cam = getCamera();
+    const cam = findCamera();
     if (!cam) {
       console.error("[Flashback] Camera not found");
       return;
@@ -86,9 +67,9 @@
 
     console.log("[Flashback] Playback started");
 
-    const interval = setInterval(() => {
+    const playInterval = setInterval(() => {
       if (!playing || i >= frames.length) {
-        clearInterval(interval);
+        clearInterval(playInterval);
         playing = false;
         console.log("[Flashback] Playback finished");
         return;
@@ -96,7 +77,7 @@
 
       const f = frames[i];
 
-      if (cam.rotation) {
+      if (cam.rotation && f.rot) {
         cam.rotation.x = f.rot.x;
         cam.rotation.y = f.rot.y;
         cam.rotation.z = f.rot.z;
@@ -112,29 +93,20 @@
     }, 50);
   }
 
-  // =====================
-  // PUBLIC API
-  // =====================
-  window.flashback = {
-    start: startRecording,
-    stop: stopRecording,
-    play: playReplay,
-    frames
-  };
+  // expose globally (IMPORTANT)
+  window.flashback = { start, stop, play, frames };
+  window.top.flashback = window.flashback;
 
-  // =====================
-  // POPUP → PAGE COMMUNICATION
-  // =====================
+  // listen for popup commands
   window.addEventListener("FLASHBACK_CMD", e => {
     const cmd = e.detail;
-    console.log("[Flashback] Command:", cmd);
-
-    if (cmd === "start") startRecording();
-    if (cmd === "stop") stopRecording();
-    if (cmd === "play") playReplay();
+    if (cmd === "start") start();
+    if (cmd === "stop") stop();
+    if (cmd === "play") play();
   });
 
   console.log("[Flashback] Ready");
+})();
 })();
     }
   };
