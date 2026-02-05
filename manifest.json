@@ -1,15 +1,16 @@
 {
   "manifest_version": 3,
   "name": "Miniblox Flashback",
-  "version": "0.1",
+  "version": "1.0",
   "description": "Client-side replay & freelook for Miniblox.io",
-  "permissions": ["activeTab", "scripting"],
-  "host_permissions": ["*://miniblox.io/*"],
+
+  "permissions": ["scripting", "activeTab"],
+  "host_permissions": ["https://miniblox.io/*"],
 
   "icons": {
-    "16": "icon.jpeg",
-    "48": "icon.jpeg",
-    "128": "icon.jpeg"
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
   },
 
   "action": {
@@ -18,6 +19,12 @@
 
   "content_scripts": [
     {
+      "matches": ["https://miniblox.io/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ]
+}
       "matches": ["*://miniblox.io/*"],
       "js": ["content.js"]
     }
