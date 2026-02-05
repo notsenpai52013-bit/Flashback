@@ -3,20 +3,16 @@
   "name": "Miniblox Flashback",
   "version": "1.0",
   "description": "Client-side replay & freelook for Miniblox.io",
-
   "permissions": ["scripting", "activeTab"],
   "host_permissions": ["https://miniblox.io/*"],
-
   "icons": {
     "16": "icon.png",
     "48": "icon.png",
     "128": "icon.png"
   },
-
   "action": {
     "default_popup": "popup.html"
   },
-
   "content_scripts": [
     {
       "matches": ["https://miniblox.io/*"],
