@@ -1,8 +1,11 @@
-console.log("[Flashback] content.js running");
+console.log("[Flashback] content.js loaded");
 
-const s = document.createElement("script");
-s.src = chrome.runtime.getURL("replay.js");
-s.onload = () => {
+const script = document.createElement("script");
+script.src = chrome.runtime.getURL("replay.js");
+script.type = "text/javascript";
+
+script.onload = () => {
   console.log("[Flashback] replay.js injected");
 };
-(document.head || document.documentElement).appendChild(s);
+
+(document.documentElement || document.head).appendChild(script);
