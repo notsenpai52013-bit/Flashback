@@ -2,10 +2,10 @@ function send(cmd) {
   chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     chrome.scripting.executeScript({
       target: { tabId: tabs[0].id },
-      func: (cmd) => {
-        window.dispatchEvent(new CustomEvent("FLASHBACK_CMD", {
-          detail: cmd
-        }));
+      func: c => {
+        window.dispatchEvent(
+          new CustomEvent("FLASHBACK_CMD", { detail: c })
+        );
       },
       args: [cmd]
     });
