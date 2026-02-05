@@ -1,12 +1,17 @@
-function exec(cmd) {
+function send(cmd) {
   chrome.tabs.query({ active: true, currentWindow: true }, tabs => {
     chrome.scripting.executeScript({
       target: { tabId: tabs[0].id },
-      func: () => window.flashback && window.flashback[cmd]()
+      func: (cmd) => {
+        window.dispatchEvent(new CustomEvent("FLASHBACK_CMD", {
+          detail: cmd
+        }));
+      },
+      args: [cmd]
     });
   });
 }
 
-document.getElementById("start").onclick = () => exec("start");
-document.getElementById("stop").onclick = () => exec("stop");
-document.getElementById("play").onclick = () => exec("play");
+document.getElementById("start").onclick = () => send("start");
+document.getElementById("stop").onclick = () => send("stop");
+document.getElementById("play").onclick = () => send("play");
