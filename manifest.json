@@ -21,8 +21,3 @@
     }
   ]
 }
-      "matches": ["*://miniblox.io/*"],
-      "js": ["content.js"]
-    }
-  ]
-}
